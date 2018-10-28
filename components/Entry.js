@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Container, Header, Content, DatePicker, Text, Form, Item, Input, Button } from 'native-base';
+import { Container, Header, Content, DatePicker, Text, Form, Item, Input, Button, Picker } from 'native-base';
 import firebase from '..//constants/Database'
 
 export default class DatePickerExample extends Component {
@@ -7,6 +7,7 @@ export default class DatePickerExample extends Component {
     super(props);
     this.state = { 
       chosenDate: new Date(),
+      categorySelected: 'Miscellaneous',
       price: ''
     };
     this.setDate = this.setDate.bind(this);
@@ -21,9 +22,15 @@ export default class DatePickerExample extends Component {
       price: newPrice
     })
   }
-  writeExpensesData(date, price){
+  setCategory(category: string) {
+    this.setState({
+      categorySelected: category
+    });
+  }
+  writeExpensesData(date, category, price){
     firebase.database().ref('expenses/').push({
         date,
+        category,
         price
       }).then((data)=>{
         //success callback
@@ -56,6 +63,19 @@ export default class DatePickerExample extends Component {
               Date: {this.state.chosenDate.toString().substr(4, 12)}
             </Text>
             <Form>
+              <Picker
+                note
+                mode="dropdown"
+                style={{ width: 120 }}
+                selectedValue={this.state.categorySelected}
+                onValueChange={this.setCategory.bind(this)}
+              >
+                <Picker.Item label="Miscellaneous" value="Miscellaneous" />
+                <Picker.Item label="Groceries" value="Groceries" />
+                <Picker.Item label="Outing " value="Outing" />
+                <Picker.Item label="Car" value="Car" />
+                <Picker.Item label="Internet" value="Internet" />
+              </Picker>
                 <Item>
                     <Input 
                       onChangeText={(price) => this.setPrice(price)} 
@@ -70,7 +90,7 @@ export default class DatePickerExample extends Component {
               rounded={true} 
               bordered={false} 
               small={true} 
-              onPress={() => this.writeExpensesData(this.state.chosenDate.toString().substr(4, 12), this.state.price)}
+              onPress={() => this.writeExpensesData(this.state.chosenDate.toString().substr(4, 12), this.state.categorySelected, this.state.price)}
             >
                 <Text>Add</Text>
             </Button>
