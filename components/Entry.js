@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { Container, Header, Content, DatePicker, Text, Form, Item, Input, Button, Picker } from 'native-base';
-import firebase from '..//constants/Database'
+import firebase from '../constants/Database'
 
-export default class DatePickerExample extends Component {
+export default class Entrh extends Component {
   constructor(props) {
     super(props);
     this.state = { 
@@ -72,7 +72,7 @@ export default class DatePickerExample extends Component {
               >
                 <Picker.Item label="Miscellaneous" value="Miscellaneous" />
                 <Picker.Item label="Groceries" value="Groceries" />
-                <Picker.Item label="Outing " value="Outing" />
+                <Picker.Item label="Outing " value="Outing" />  
                 <Picker.Item label="Car" value="Car" />
                 <Picker.Item label="Internet" value="Internet" />
               </Picker>
