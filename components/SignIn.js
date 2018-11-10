@@ -44,6 +44,7 @@ export default class SignIn extends Component {
               <AppNavigator />
             );
         } else {
+            console.info(this.state.error);
             return (
                 <Container>
                     <Header />

@@ -1,46 +1,53 @@
-import React, { Component } from 'react';
-import { Container, Header, Content, DatePicker, Text, Form, Item, Input, Button, Picker } from 'native-base';
+import React, { Component } from 'react'
+import { Container, Header, Content, DatePicker, Text, Form, Item, Input, Button, Picker } from 'native-base'
 import firebase from '../constants/Database'
 
 export default class Entrh extends Component {
   constructor(props) {
-    super(props);
+    super(props)
     this.state = { 
       chosenDate: new Date(),
       categorySelected: 'Miscellaneous',
-      price: ''
-    };
-    this.setDate = this.setDate.bind(this);
+      price: '',
+      uid: '',
+      error: '',
+      authorized: true
+    }
+    this.setDate = this.setDate.bind(this)
   }
-  setDate(newDate) {
-    this.setState({ 
-      chosenDate: newDate  
-    })
+  setDate(chosenDate) {
+    this.setState({ chosenDate })
   }
-  setPrice(newPrice) {
-    this.setState({
-      price: newPrice
-    })
+  setPrice(price) {
+    this.setState({ price })
   }
-  setCategory(category: string) {
-    this.setState({
-      categorySelected: category
-    });
+  setCategory(categorySelected) {
+    this.setState({ categorySelected })
+  }
+  setUserId(uid) {
+    this.setState({ uid })
   }
   writeExpensesData(date, category, price){
+    const uid = this.state.uid
     firebase.database().ref('expenses/').push({
+        uid,
         date,
         category,
         price
-      }).then((data)=>{
-        //success callback
+    }).then((data)=>{
         console.log('data ' , data)
     }).catch((error)=>{
-        //error callback
         console.log('error ' , error)
     })
   }
-   render() {
+  componentDidMount() {
+    if (firebase.auth().currentUser !== null) {
+        this.setUserId(firebase.auth().currentUser.uid)
+    } else {
+      this.setState({ error: 'Authentication failed: current user not found.', authorized: false })
+    }
+  }
+  render() {
     return (
       <Container>
         <Header />
@@ -96,6 +103,6 @@ export default class Entrh extends Component {
             </Button>
         </Content>
       </Container>
-    );
+    )
   }
 }
