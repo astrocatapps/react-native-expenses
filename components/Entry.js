@@ -2,11 +2,11 @@ import React, { Component } from 'react'
 import { Container, Header, Content, DatePicker, Text, Form, Item, Input, Button, Picker } from 'native-base'
 import firebase from '../constants/Database'
 
-export default class Entrh extends Component {
+export default class Entry extends Component {
   constructor(props) {
     super(props)
     this.state = { 
-      chosenDate: new Date(),
+      date: new Date(),
       categorySelected: 'Miscellaneous',
       price: '',
       uid: '',
@@ -15,8 +15,8 @@ export default class Entrh extends Component {
     }
     this.setDate = this.setDate.bind(this)
   }
-  setDate(chosenDate) {
-    this.setState({ chosenDate })
+  setDate(date) {
+    this.setState({ date })
   }
   setPrice(price) {
     this.setState({ price })
@@ -29,8 +29,8 @@ export default class Entrh extends Component {
   }
   writeExpensesData(date, category, price){
     const uid = this.state.uid
-    firebase.database().ref('expenses/').push({
-        uid,
+    firebase.database().ref('expenses/' + this.state.uid).push({
+        uid,  
         date,
         category,
         price
@@ -67,7 +67,7 @@ export default class Entrh extends Component {
             onDateChange={this.setDate}
             />
             <Text>
-              Date: {this.state.chosenDate.toString().substr(4, 12)}
+              Date: {this.state.date.toString().substr(4, 12)}
             </Text>
             <Form>
               <Picker
@@ -97,7 +97,7 @@ export default class Entrh extends Component {
               rounded={true} 
               bordered={false} 
               small={true} 
-              onPress={() => this.writeExpensesData(this.state.chosenDate.toString().substr(4, 12), this.state.categorySelected, this.state.price)}
+              onPress={() => this.writeExpensesData(this.state.date.toString().substr(4, 12), this.state.categorySelected, this.state.price)}
             >
                 <Text>Add</Text>
             </Button>
