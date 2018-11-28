@@ -2,7 +2,7 @@ import React from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
 import { ExpoLinksView } from '@expo/samples'
 import firebase from '../constants/Database'
-import { Container, Header, Content, List, ListItem, Text } from 'native-base'
+import { Container, Header, Content, List, ListItem, Text, Body, Right } from 'native-base'
 
 export default class ExpensesScreen extends React.Component {
   static navigationOptions = {
@@ -11,68 +11,43 @@ export default class ExpensesScreen extends React.Component {
 
   constructor(props) {
     super(props)
-    this.state = { 
+    this.state = {
+      loaded: false,
       entries: []
     }
+  }
+  setLoaded(loaded) {
+    this.setState({ loaded })
   }
   setEntries(entries) {
     this.setState({ entries })
   }
 
   componentDidMount() {
-    const self = this
+    const self = this,
+      dates = [];
+
     if (firebase.auth().currentUser !== null) {
-        //@todo read expenses using uid as reference
         const uid = firebase.auth().currentUser.uid
 
+        firebase.database().ref('expenses/' + uid).once('value', function(snapshot) {
+            
+            snapshot.forEach(function(childSnapshot) {
+              var childSnapshotData = childSnapshot.val()
+              dates.push(childSnapshotData.date)
+            })
+
+            if (dates.length) {
+              self.setEntries(dates)
+            }
+        })
         
-          console.info('uid: ', uid);
-  
-          firebase.database().ref('expenses/' + uid)
-            .once('value', function(snapshot) {
-              console.info(snapshot);
-              
-              var arr = [];
-
-              // for (var key in myObject) {
-              //   arr.push(myObject[key]);
-              // }
-
-              snapshot.forEach(function(childSnapshot) {
-                console.info('first foreach', childSnapshot);
-
-                console.info('first foreach', snapshot[childSnapshot]);
-                childSnapshot.forEach(function(key){
-                  console.info('second foreach', childSnapshot[key]);
-                  // arr.push(rec);
-                })
-                
-              })
-
-              console.info('getting data:', arr);
-
-              // self.setEntries(arr);
-
-          })
-
     } else {
-      console.info('ExpensesScreen: componentDidMount else');
+      console.error('ExpensesScreen: componentDidMount else')
     }
   }
 
   render() {
-    // let dates = Object.keys(this.state.expenses)
-
-    console.info('render entries', this.state.entries);
-
-    var items = [
-      'Simon Mignolet',
-      'Nathaniel Clyne',
-      'Dejan Lovren',
-      'Mama Sakho',
-      'Emre Can'
-    ];
-
     return (
       <Container>
         <Header />
@@ -80,7 +55,12 @@ export default class ExpensesScreen extends React.Component {
           <List dataArray={this.state.entries}
             renderRow={(item) =>
               <ListItem>
-                <Text>{item}</Text>
+                <Body>
+                  <Text>{item}</Text>
+                </Body>
+                <Right>
+                  <Text>$10</Text>
+                </Right>
               </ListItem>
             }>
           </List>
@@ -95,5 +75,5 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 15,
     backgroundColor: '#fff',
-  },
-});
+  }
+})
